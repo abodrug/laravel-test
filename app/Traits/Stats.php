@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Redis;
 
 trait Stats
 {
-    private $cache = 'redis';
+    private $cache = "redis";
 
     public function getStats(int $userId)
     {
-        return Cache::store($this->cache)->get("api:users:{$userId}", 0);
+        return (int) Cache::store($this->cache)->get("api:users:{$userId}", 0);
     }
 
     public function setStats(int $userId, int $value)
@@ -21,23 +21,23 @@ trait Stats
 
     public function getStatsAll()
     {
-        return Cache::store($this->cache)->get("api:total-request", 0);
+        return (int) Cache::store($this->cache)->get("api:total-request", 0);
     }
 
     public function setStatsAll(int $total)
     {
-        Cache::store($this->cache)->put('api:total-request', $total);;
+        Cache::store($this->cache)->put("api:total-request", $total);;
     }
 
     public function getUsers()
     {
         $redis = Redis::connection();
-        $users = $redis->keys('*api:users:*');
+        $users = $redis->keys("*api:users:*");
         $total = 0;
         foreach ($users as $user) {
-            $mas = explode(':', $user);
+            $mas = explode(":", $user);
             $userId = $mas[3];
-            $total += (int) Cache::store($this->cache)->get('api:users:'.$userId);
+            $total += $this->getStats($userId);
         }
         $this->setStatsAll($total);
     }
